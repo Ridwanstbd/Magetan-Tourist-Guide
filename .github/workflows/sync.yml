@@ -18,4 +18,4 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         # GANTI URL DI BAWAH INI SESUAI AKUN ANDA
-        run: git push --force https://github_deploy_token:$HF_TOKEN@huggingface.co/spaces/github_deploy_token/magetan-tourist-guide main
+        run: git push --force https://github_deploy_token:$HF_TOKEN@huggingface.co/spaces/Ridwanstbd/Magetan-Tourist-Guide main
