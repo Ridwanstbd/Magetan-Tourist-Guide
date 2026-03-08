@@ -1,0 +1,21 @@
+name: Sync to Hugging Face hub
+
+on:
+  push:
+    branches: [main] # Akan jalan setiap ada push ke branch main
+  workflow_dispatch:
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        # GANTI URL DI BAWAH INI SESUAI AKUN ANDA
+        run: git push --force https://github_deploy_token:$HF_TOKEN@huggingface.co/spaces/github_deploy_token/magetan-tourist-guide main
