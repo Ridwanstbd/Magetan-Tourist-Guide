@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.preprocessing import StandardScaler
+import numpy as np
+from sklearn.preprocessing import RobustScaler
 from sklearn.cluster import KMeans
-import time
 
 st.set_page_config(page_title="Magetan Tourist Guide", page_icon="🎒", layout="wide")
 
@@ -16,20 +16,30 @@ st.markdown("")
 @st.cache_data
 def load_data():
     df = pd.read_csv("kunjungan_wisata_magetan_2021_2025.csv")
-    
-    # Feature Engineering (Menghindari pembagian dengan nol)
     df['Growth_Rate'] = (df['Kunjungan 2025'] - df['Kunjungan 2021']) / (df['Kunjungan 2021'] + 1)
+    batas_atas_growth = df['Growth_Rate'].quantile(0.95)
+    df['Growth_Rate_Capped'] = df['Growth_Rate'].clip(upper=batas_atas_growth)
+
+    df['Log_Kunjungan'] = np.log1p(df['Kunjungan 2025'])
+    df['Log_Review'] = np.log1p(df['Review Count'])
     return df
 
 df = load_data()
 
-#  2. PREPROCESSING & MACHINE LEARNING 
-features = ['Kunjungan 2025', 'Growth_Rate', 'Rating', 'Review Count', 'Akses Mudah']
-df_ml = df[features].fillna(0)
 
-# Standarisasi Skala Data
-scaler = StandardScaler()
-scaled_data = scaler.fit_transform(df_ml)
+features_final = [
+    'Log_Kunjungan',
+    'Growth_Rate_Capped',
+    'Rating',
+    'Log_Review',
+    'Akses Mudah'
+]
+
+df_ml = df[features_final].fillna(0)
+
+scaler_robust = RobustScaler()
+scaled_data = scaler_robust.fit_transform(df_ml)
+
 
 # K-Means Clustering
 kmeans = KMeans(n_clusters=4, random_state=42)
